@@ -439,6 +439,11 @@ public class Database {
     return subjects;
   }
 
+  public static ArrayList<Subject> getSubjectsAccordingToSemesterName(String semesterName) {
+    Semester semester = Database.getSemesterAccordingToName(semesterName);
+    return Database.getSubjectsAccordingToSemesterId(semester.getId());
+  }
+
   public static ArrayList<Subject> getSubjectsAccordingToTeacherId(int teacherId) {
     ArrayList<Subject> subjects = new ArrayList<>();
     Connection conn = connectStudyPartnerDB();
@@ -871,18 +876,17 @@ public class Database {
     return exams;
   }
 
-  public static ArrayList<Exam> getExamsAccordingToSubjectName(String subjectName) {
+  public static Exam getExamsAccordingToSubjectName(String subjectName) {
     Connection conn = connectStudyPartnerDB();
     Subject subject = getSubjectAccordingToName(subjectName);
-    ArrayList<Exam> exams = new ArrayList<>();
+    Exam exam = null;
 
     try {
       PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM exams WHERE subject_id = ?");
       preparedStatement.setInt(1, subject.getId());
       ResultSet result = preparedStatement.executeQuery();
-      while (result.next()) {
-        Exam exam = getSingleExamFromDB(result);
-        exams.add(exam);
+      if (result.next()) {
+        exam = getSingleExamFromDB(result);
       }
     } catch (Exception exc) {
       exc.printStackTrace();
@@ -894,7 +898,7 @@ public class Database {
       }
     }
 
-    return exams;
+    return exam;
   }
 
   public static ArrayList<Exam> getExamsAccordingToDate(LocalDate date) {

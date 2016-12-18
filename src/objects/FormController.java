@@ -130,6 +130,8 @@ public class FormController {
 
     }
 
+    cbbModelSubjectSemester.addElement("--Choose Semester--");
+
     ArrayList<Semester> semesters = Database.getSemesters();
     for (Semester semester : semesters) {
       cbbModelSubjectSemester.addElement(semester.getName());
@@ -139,7 +141,7 @@ public class FormController {
   public void updateCbbModelExamChooseDate() {
     try {
       cbbModelExamChooseDate.removeAllElements();
-    } catch (NullPointerException) {
+    } catch (NullPointerException exc) {
 
     }
 

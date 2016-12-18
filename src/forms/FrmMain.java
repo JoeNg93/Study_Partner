@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public class FrmMain {
@@ -56,6 +57,7 @@ public class FrmMain {
   private JButton btnEditExam;
   private JButton btnDeleteExam;
   private FrmAddExam frmAddExam;
+  private FrmEditExam frmEditExam;
 
   private FormController formController;
 
@@ -167,7 +169,19 @@ public class FrmMain {
 
     /* frmAddExam initialization */
     frmAddExam = new FrmAddExam();
+    frmAddExam.getCbbExamSubject().setModel(formController.getCbbModelExamSubject());
     handleConfirmOnBtnAddExam();
+
+    /* btnEditExam initialization */
+    handleClickOnBtnEditExam();
+
+    /* frmEditExam initialization */
+    frmEditExam = new FrmEditExam();
+    frmEditExam.getCbbExamSubject().setModel(formController.getCbbModelExamSubject());
+    handleConfirmOnBtnEditExam();
+
+    /* btnDeleteExam initialization */
+    handleClickOnBtnDeleteExam();
   }
 
   public static void main(String[] args) {
@@ -195,19 +209,8 @@ public class FrmMain {
   }
 
   private void updateTblSubjects() {
-    // Clear the table model first
-    formController.getTblModelSubject().setRowCount(0);
-
     subjects = Database.getSubjects();
-
-    DefaultTableModel tblModelSubject = formController.getTblModelSubject();
-
-    for (Subject eachSubject : subjects) {
-      String subjectName = eachSubject.getName();
-      int subjectCredits = eachSubject.getCredits();
-      Teacher subjectTeacher = eachSubject.getTeacher();
-      tblModelSubject.addRow(new Object[]{subjectName, subjectCredits, subjectTeacher.getName()});
-    }
+    sendDataToTblSubjects();
   }
 
   public void handleClickOnCbbSubjectChooseSemester() {
@@ -215,7 +218,8 @@ public class FrmMain {
       @Override
       public void actionPerformed(ActionEvent e) {
         if (cbbSubjectChooseSemester.getSelectedIndex() != 0) {
-          fetchDataAccordingToCbbSemesterSelectedIndex();
+//          fetchDataAccordingToCbbSemesterSelectedIndex();
+          subjects = Database.getSubjectsAccordingToSemesterName((String)cbbSubjectChooseSemester.getSelectedItem());
           sendDataToTblSubjects();
         } else {
           updateTblSubjects();
@@ -226,6 +230,8 @@ public class FrmMain {
 
   public void handleClickOnBtnAddSubject() {
     btnAddSubject.addActionListener((ActionEvent e) -> {
+      formController.updateCbbModelSubjectSemester();
+      formController.updateCbbModelSubjectTeacher();
       frmAddSubject.getCbbSubjectSemester().setSelectedIndex(cbbSubjectChooseSemester.getSelectedIndex());
       frmAddSubject.setVisible(true);
     });
@@ -245,15 +251,15 @@ public class FrmMain {
       Subject subject = new Subject(name, credits, semester, teacher);
 
       Database.addSubject(subject);
-      fetchDataAccordingToCbbSemesterSelectedIndex();
-      updateTblSemesters();
-      sendDataToTblSubjects();
+      cbbSubjectChooseSemester.setSelectedIndex(frmAddSubject.getCbbSubjectSemester().getSelectedIndex());
       frmAddSubject.dispose();
     });
   }
 
   public void handleClickOnBtnEditSubject() {
     btnEditSubject.addActionListener(evt -> {
+      formController.updateCbbModelSubjectTeacher();
+      formController.updateCbbModelSubjectSemester();
       frmEditSubject.setVisible(true);
 
       int selectedRow = tblSubjects.getSelectedRow();
@@ -290,7 +296,7 @@ public class FrmMain {
       subject.setSemester(semester);
 
       Database.updateSubjectAccordingToId(subject);
-      fetchDataAccordingToCbbSemesterSelectedIndex();
+      fetchSubjectsAccordingToCbbSubjectChooseSemesterSelectedIndex();
       sendDataToTblSubjects();
       frmEditSubject.dispose();
     });
@@ -302,7 +308,7 @@ public class FrmMain {
       String subjectName = (String) tblSubjects.getValueAt(selectedRow, 0);
 
       Database.deleteSubjectAccordingToName(subjectName);
-      fetchDataAccordingToCbbSemesterSelectedIndex();
+      fetchSubjectsAccordingToCbbSubjectChooseSemesterSelectedIndex();
       sendDataToTblSubjects();
       updateTblSemesters();
     });
@@ -323,18 +329,8 @@ public class FrmMain {
   }
 
   private void updateTblSemesters() {
-    // Clear the table model first
-    formController.getTblModelSemester().setRowCount(0);
-
     semesters = Database.getSemesters();
-
-    DefaultTableModel tblModelSemester = formController.getTblModelSemester();
-
-    semesters.forEach(semester -> {
-      String semesterName = semester.getName();
-      int totalCredits = Database.getTotalCreditsOfSemester(semester.getId());
-      tblModelSemester.addRow(new Object[]{semesterName, totalCredits});
-    });
+    sendDataToTblSemesters();
   }
 
   public void handleClickOnBtnAddSemester() {
@@ -364,8 +360,11 @@ public class FrmMain {
       Semester semester = new Semester(academicTerm + " " + academicYear);
       Database.addSemester(semester);
       updateTblSemesters();
+      String currentSelectSemester = (String)cbbSubjectChooseSemester.getSelectedItem();
       formController.updateCbbModelSubjectChooseSemester();
-      updateTblSubjects();
+      cbbSubjectChooseSemester.setSelectedItem(currentSelectSemester);
+      fetchSubjectsAccordingToCbbSubjectChooseSemesterSelectedIndex();
+      sendDataToTblSubjects();
       frmAddSemester.dispose();
     });
   }
@@ -429,18 +428,8 @@ public class FrmMain {
   }
 
   private void updateTblTeachers() {
-    // Clear the table model first
-    formController.getTblModelTeacher().setRowCount(0);
-
     teachers = Database.getTeachers();
-
-    DefaultTableModel tblModelTeacher = formController.getTblModelTeacher();
-
-    teachers.forEach(teacher -> {
-      String name = teacher.getName();
-      String phoneNumber = teacher.getPhoneNumber();
-      tblModelTeacher.addRow(new Object[]{name, phoneNumber});
-    });
+    sendDataToTblTeachers();
   }
 
   public void handleClickOnBtnAddTeacher() {
@@ -457,7 +446,6 @@ public class FrmMain {
 
       Database.addTeacher(teacher);
       updateTblTeachers();
-      formController.updateCbbModelSubjectTeacher();
       frmAddTeacher.dispose();
     });
   }
@@ -488,9 +476,8 @@ public class FrmMain {
 
       Database.updateTeacherAccordingToId(teacher);
       updateTblTeachers();
-      fetchDataAccordingToCbbSemesterSelectedIndex();
+      fetchSubjectsAccordingToCbbSubjectChooseSemesterSelectedIndex();
       sendDataToTblSubjects();
-      formController.updateCbbModelSubjectTeacher();
       frmEditTeacher.dispose();
     });
   }
@@ -502,7 +489,8 @@ public class FrmMain {
 
       Database.deleteTeacherAccordingToName(teacherName);
       updateTblTeachers();
-      formController.updateCbbModelSubjectTeacher();
+      fetchSubjectsAccordingToCbbSubjectChooseSemesterSelectedIndex();
+      sendDataToTblSubjects();
     });
   }
 
@@ -536,30 +524,76 @@ public class FrmMain {
   }
 
   private void updateTblExams() {
-    formController.getTblModelExam().setRowCount(0);
-
     exams = Database.getExams();
-
-    DefaultTableModel tblModelExam = formController.getTblModelExam();
-
-    exams.forEach(exam -> {
-      String subjectName = exam.getSubject().getName();
-      String date = exam.getDate().toString();
-      String startTime = exam.getStartTime().toString();
-      String description = exam.getDescription();
-
-      tblModelExam.addRow(new Object[]{subjectName, date, startTime, description});
-    });
+    sendDataToTblExams();
   }
 
   public void handleClickOnBtnAddExam() {
     btnAddExam.addActionListener(e -> {
+      formController.updateCbbModelExamSubject();
       frmAddExam.setVisible(true);
     });
   }
 
   public void handleConfirmOnBtnAddExam() {
+    frmAddExam.getBtnAddExam().addActionListener(e -> {
+      Subject subject = Database.getSubjectAccordingToName((String)frmAddExam.getCbbExamSubject().getSelectedItem());
+      LocalDate examDate = LocalDate.parse(frmAddExam.getTxtDate().getText());
+      LocalTime startTime = LocalTime.parse(frmAddExam.getTxtStartTime().getText());
+      String description = frmAddExam.getTxtDescription().getText();
 
+      Exam exam = new Exam(subject, startTime, examDate, description);
+      Database.addExam(exam);
+      updateTblExams();
+    });
+  }
+
+  public void handleClickOnBtnEditExam() {
+    btnEditExam.addActionListener(e -> {
+      formController.updateCbbModelExamSubject();
+      frmEditExam.setVisible(true);
+
+      int selectedRow = tblExams.getSelectedRow();
+      String subjectName = (String)tblExams.getValueAt(selectedRow, 0);
+      String examDate = (String)tblExams.getValueAt(selectedRow, 1);
+      String startTime = (String)tblExams.getValueAt(selectedRow, 2);
+      String description = (String)tblExams.getValueAt(selectedRow, 3);
+
+      frmEditExam.getCbbExamSubject().setSelectedItem(subjectName);
+      frmEditExam.getTxtDate().setText(examDate);
+      frmEditExam.getTxtStartTime().setText(startTime);
+      frmEditExam.getTxtDescription().setText(description);
+    });
+  }
+
+  public void handleConfirmOnBtnEditExam() {
+    frmEditExam.getBtnEditExam().addActionListener(e -> {
+      int selectedRow = tblExams.getSelectedRow();
+      Exam currentExam = Database.getExamsAccordingToSubjectName((String)tblExams.getValueAt(selectedRow, 0));
+
+      Subject subject = Database.getSubjectAccordingToName((String)frmEditExam.getCbbExamSubject().getSelectedItem());
+      LocalDate examDate = LocalDate.parse(frmEditExam.getTxtDate().getText());
+      LocalTime startTime = LocalTime.parse(frmEditExam.getTxtStartTime().getText());
+      String description = frmEditExam.getTxtDescription().getText();
+
+      currentExam.setSubject(subject);
+      currentExam.setDate(examDate);
+      currentExam.setStartTime(startTime);
+      currentExam.setDescription(description);
+
+      Database.updateExamAccordingToId(currentExam);
+      updateTblExams();
+      formController.updateCbbModelExamChooseDate();
+    });
+  }
+
+  public void handleClickOnBtnDeleteExam() {
+    btnDeleteExam.addActionListener(e -> {
+      int selectedRow = tblExams.getSelectedRow();
+      Exam currentExam = Database.getExamsAccordingToSubjectName((String)tblExams.getValueAt(selectedRow, 0));
+      Database.deleteExamAccordingToId(currentExam.getId());
+      updateTblExams();
+    });
   }
 
   /* -------------------- OTHER STUFF -------------------- */
@@ -569,4 +603,11 @@ public class FrmMain {
     sendDataToTblTeachers();
   }
 
+  private void fetchSubjectsAccordingToCbbSubjectChooseSemesterSelectedIndex() {
+    if (cbbSubjectChooseSemester.getSelectedIndex() != 0) {
+      subjects = Database.getSubjectsAccordingToSemesterName((String)cbbSubjectChooseSemester.getSelectedItem());
+    } else {
+      subjects = Database.getSubjects();
+    }
+  }
 }
