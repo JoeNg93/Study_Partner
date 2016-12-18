@@ -43,4 +43,8 @@ public class FrmAddSubject extends JFrame {
   public JButton getBtnAddSubject() {
     return btnAddSubject;
   }
+
+  private void createUIComponents() {
+    // TODO: place custom component creation code here
+  }
 }

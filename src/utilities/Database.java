@@ -936,6 +936,44 @@ public class Database {
     return examDates;
   }
 
+  public static void updateExamAccordingToId(Exam exam) {
+    Connection conn = connectStudyPartnerDB();
+    try {
+      PreparedStatement preparedStatement = conn.prepareStatement("UPDATE exams SET start_time = ?, date = ?, description = ? " +
+          "WHERE id = ?");
+      preparedStatement.setString(1, exam.getStartTime().toString());
+      preparedStatement.setString(2, exam.getDate().toString());
+      preparedStatement.setString(3, exam.getDescription());
+      preparedStatement.setInt(4, exam.getId());
+      preparedStatement.executeUpdate();
+    } catch (Exception exc) {
+      exc.printStackTrace();
+    } finally {
+      try {
+        conn.close();
+      } catch (SQLException exc) {
+        exc.printStackTrace();
+      }
+    }
+  }
+
+  public static void deleteExamAccordingToId(int examId) {
+    Connection conn = connectStudyPartnerDB();
+    try {
+      PreparedStatement preparedStatement = conn.prepareStatement("DELETE FROM exams WHERE id = ?");
+      preparedStatement.setInt(1, examId);
+      preparedStatement.executeUpdate();
+    } catch (Exception exc) {
+      exc.printStackTrace();
+    } finally {
+      try {
+        conn.close();
+      } catch (SQLException exc) {
+        exc.printStackTrace();
+      }
+    }
+  }
+
   /* ---------- UTILITIES ---------- */
   private static Semester getSingleSemesterFromDB(ResultSet result) throws SQLException {
     int id = result.getInt("id");

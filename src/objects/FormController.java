@@ -4,10 +4,6 @@ import utilities.Database;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 /**
@@ -20,38 +16,26 @@ public class FormController {
   private DefaultTableModel tblModelTeacher;
   private DefaultTableModel tblModelExam;
 
-  private DefaultComboBoxModel cbbModelSemester;
-  private DefaultComboBoxModel cbbModelChooseTerm;
-  private DefaultComboBoxModel cbbModelSubjectSemester;
-  private DefaultComboBoxModel cbbModelSubjectTeacher;
-  private DefaultComboBoxModel cbbModelChooseDate;
+  // Name note: cbbModel[tabName][nameOfCombobox]
+  private DefaultComboBoxModel cbbModelSubjectChooseSemester; // Choose semester of Subject tab
+  private DefaultComboBoxModel cbbModelSemesterTerm; // Choose term of Semester tab, Add Semester
+  private DefaultComboBoxModel cbbModelSubjectSemester; // Choose semester of Subject tab, Add Subject
+  private DefaultComboBoxModel cbbModelSubjectTeacher; // Choose teacher of Subject tab, Add Subject
+  private DefaultComboBoxModel cbbModelExamChooseDate; // Choose date of Exam tab
+  private DefaultComboBoxModel cbbModelExamSubject;
 
   public FormController() {
-    initializeCbbModelSemester();
-    fetchSemesterToComboBox();
-
-    initializeCbbModelChooseTerm();
-
     initializeTblModelSubject();
-
     initializeTblModelSemester();
-
     initializeTblModelTeacher();
-
     initializeTblModelExam();
 
-    initializeCbbModelSubjectTeacher();
-
+    initializeCbbModelSubjectChooseSemester();
+    initializeCbbModelSemesterTerm();
     initializeCbbModelSubjectSemester();
-
-    initializeCbbModelChooseDate();
-  }
-
-  public void fetchSemesterToComboBox() {
-    ArrayList<Semester> semesters = Database.getSemesters();
-    for (Semester semester : semesters) {
-      cbbModelSemester.addElement(semester.getName());
-    }
+    initializeCbbModelSubjectTeacher();
+    initializeCbbModelExamChooseDate();
+    initializeCbbModelExamSubject();
   }
 
   private void initializeTblModelSubject() {
@@ -78,40 +62,24 @@ public class FormController {
     tblModelExam.addColumn("Description");
   }
 
-  private void initializeCbbModelSemester() {
-    cbbModelSemester = new DefaultComboBoxModel();
-
-    cbbModelSemester.addElement("--Choose semester-- ");
+  private void initializeCbbModelSubjectChooseSemester() {
+    cbbModelSubjectChooseSemester = new DefaultComboBoxModel();
   }
 
   private void initializeCbbModelSubjectTeacher() {
     cbbModelSubjectTeacher = new DefaultComboBoxModel();
-
-    cbbModelSubjectTeacher.addElement("--Choose Teacher--");
-
-    ArrayList<Teacher> teachers = Database.getTeachers();
-    for (Teacher teacher : teachers) {
-      cbbModelSubjectTeacher.addElement(teacher.getName());
-    }
   }
 
   private void initializeCbbModelSubjectSemester() {
     cbbModelSubjectSemester = new DefaultComboBoxModel();
-
-    cbbModelSubjectSemester.addElement("--Choose Semester--");
-
-    ArrayList<Semester> semesters = Database.getSemesters();
-    for (Semester semester : semesters) {
-      cbbModelSubjectSemester.addElement(semester.getName());
-    }
   }
 
-  public void initializeCbbModelChooseTerm() {
-    cbbModelChooseTerm = new DefaultComboBoxModel();
+  public void initializeCbbModelSemesterTerm() {
+    cbbModelSemesterTerm = new DefaultComboBoxModel();
 
-    cbbModelChooseTerm.addElement("--Choose term--");
-    cbbModelChooseTerm.addElement("Autumn");
-    cbbModelChooseTerm.addElement("Spring");
+    cbbModelSemesterTerm.addElement("--Choose term--");
+    cbbModelSemesterTerm.addElement("Autumn");
+    cbbModelSemesterTerm.addElement("Spring");
   }
 
   public void initializeTblModelTeacher() {
@@ -121,31 +89,28 @@ public class FormController {
     tblModelTeacher.addColumn("Phone Number");
   }
 
-  public void initializeCbbModelChooseDate() {
-    cbbModelChooseDate = new DefaultComboBoxModel();
-
-    cbbModelChooseDate.addElement("--Choose date--");
-
-    ArrayList<String> examDates = Database.getAllExamDates();
-    for (String examDate : examDates) {
-      cbbModelChooseDate.addElement(examDate);
-    }
+  public void initializeCbbModelExamChooseDate() {
+    cbbModelExamChooseDate = new DefaultComboBoxModel();
   }
 
-  public void renderCbbModelSemester() {
+  public void initializeCbbModelExamSubject() {
+    cbbModelExamSubject = new DefaultComboBoxModel();
+  }
+
+  public void updateCbbModelSubjectChooseSemester() {
     try {
-      cbbModelSemester.removeAllElements();
+      cbbModelSubjectChooseSemester.removeAllElements();
     } catch (NullPointerException exc) { }
 
-    cbbModelSemester.addElement("--Choose semester-- ");
+    cbbModelSubjectChooseSemester.addElement("--Choose semester-- ");
 
     ArrayList<Semester> semesters = Database.getSemesters();
     for (Semester semester : semesters) {
-      cbbModelSemester.addElement(semester.getName());
+      cbbModelSubjectChooseSemester.addElement(semester.getName());
     }
   }
 
-  public void renderCbbModelSubjectTeacher() {
+  public void updateCbbModelSubjectTeacher() {
     try {
       cbbModelSubjectTeacher.removeAllElements();
     } catch (NullPointerException exc) { }
@@ -158,8 +123,51 @@ public class FormController {
     }
   }
 
-  public DefaultComboBoxModel getCbbModelSemester() {
-    return cbbModelSemester;
+  public void updateCbbModelSubjectSemester() {
+    try {
+      cbbModelSubjectSemester.removeAllElements();
+    } catch (NullPointerException exc) {
+
+    }
+
+    ArrayList<Semester> semesters = Database.getSemesters();
+    for (Semester semester : semesters) {
+      cbbModelSubjectSemester.addElement(semester.getName());
+    }
+  }
+
+  public void updateCbbModelExamChooseDate() {
+    try {
+      cbbModelExamChooseDate.removeAllElements();
+    } catch (NullPointerException) {
+
+    }
+
+    cbbModelExamChooseDate.addElement("--Choose Date--");
+
+    ArrayList<Exam> exams = Database.getExams();
+    for (Exam exam : exams) {
+      cbbModelExamChooseDate.addElement(exam.getDate().toString());
+    }
+  }
+
+  public void updateCbbModelExamSubject() {
+    try {
+      cbbModelExamSubject.removeAllElements();
+    } catch (NullPointerException exc) {
+
+    }
+
+    cbbModelExamSubject.addElement("--Choose Subject");
+
+    ArrayList<Subject> subjects = Database.getSubjects();
+    for (Subject subject: subjects) {
+      cbbModelExamSubject.addElement(subject.getName());
+    }
+  }
+
+  public DefaultComboBoxModel getCbbModelSubjectChooseSemester() {
+    return cbbModelSubjectChooseSemester;
   }
 
   public DefaultTableModel getTblModelSubject() {
@@ -174,8 +182,8 @@ public class FormController {
     return tblModelExam;
   }
 
-  public DefaultComboBoxModel getCbbModelChooseTerm() {
-    return cbbModelChooseTerm;
+  public DefaultComboBoxModel getCbbModelSemesterTerm() {
+    return cbbModelSemesterTerm;
   }
 
   public DefaultTableModel getTblModelTeacher() {
@@ -190,7 +198,11 @@ public class FormController {
     return cbbModelSubjectTeacher;
   }
 
-  public DefaultComboBoxModel getCbbModelChooseDate() {
-    return cbbModelChooseDate;
+  public DefaultComboBoxModel getCbbModelExamChooseDate() {
+    return cbbModelExamChooseDate;
+  }
+
+  public DefaultComboBoxModel getCbbModelExamSubject() {
+    return cbbModelExamSubject;
   }
 }

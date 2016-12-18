@@ -50,7 +50,7 @@
                       <text value="Semester"/>
                     </properties>
                   </component>
-                  <component id="1ec64" class="javax.swing.JComboBox" binding="cbbSemesters">
+                  <component id="1ec64" class="javax.swing.JComboBox" binding="cbbSubjectChooseSemester">
                     <constraints>
                       <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -290,7 +290,7 @@
                       <text value="Date"/>
                     </properties>
                   </component>
-                  <component id="b2211" class="javax.swing.JComboBox" binding="cbbChooseDate">
+                  <component id="b2211" class="javax.swing.JComboBox" binding="cbbExamChooseDate">
                     <constraints>
                       <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>

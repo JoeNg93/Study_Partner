@@ -4,7 +4,7 @@ import javax.swing.*;
 
 public class FrmAddSemester extends JFrame {
   private JPanel pnAddSemester;
-  private JComboBox cbbChooseTerm;
+  private JComboBox cbbSemesterTerm;
   private JTextField txtAcademicYear;
   private JButton btnAddSemester;
 
@@ -15,8 +15,8 @@ public class FrmAddSemester extends JFrame {
     setVisible(false);
   }
 
-  public JComboBox getCbbChooseTerm() {
-    return cbbChooseTerm;
+  public JComboBox getCbbSemesterTerm() {
+    return cbbSemesterTerm;
   }
 
   public JTextField getTxtAcademicYear() {

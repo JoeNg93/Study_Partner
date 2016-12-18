@@ -10,8 +10,8 @@ public class FrmEditSubject extends JFrame{
   private JTextField txtName;
   private JButton btnEditSubject;
   private JTextField txtCredits;
-  private JComboBox cbbSemester;
-  private JComboBox cbbTeacher;
+  private JComboBox cbbSubjectSemester;
+  private JComboBox cbbSubjectTeacher;
 
   public FrmEditSubject() {
     setContentPane(pnEditSubject);
@@ -24,12 +24,12 @@ public class FrmEditSubject extends JFrame{
     return btnEditSubject;
   }
 
-  public JComboBox getCbbSemester() {
-    return cbbSemester;
+  public JComboBox getCbbSubjectSemester() {
+    return cbbSubjectSemester;
   }
 
-  public JComboBox getCbbTeacher() {
-    return cbbTeacher;
+  public JComboBox getCbbSubjectTeacher() {
+    return cbbSubjectTeacher;
   }
 
   public JTextField getTxtCredits() {
