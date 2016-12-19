@@ -19,7 +19,7 @@ public class FrmEditTimetable extends JFrame{
   public FrmEditTimetable() {
     setContentPane(pnEditTimetable);
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    pack();
+    setSize(500, 500);
     setVisible(false);
   }
 

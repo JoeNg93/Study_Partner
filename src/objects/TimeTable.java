@@ -91,4 +91,8 @@ public class TimeTable {
   public String getRoomNumber() {
     return roomNumber;
   }
+
+  public int getId() {
+    return id;
+  }
 }

@@ -159,10 +159,7 @@ public class FormController {
   }
 
   public void updateCbbModelSubjectChooseSemester() {
-    try {
-      cbbModelSubjectChooseSemester.removeAllElements();
-    } catch (NullPointerException exc) {
-    }
+    initializeCbbModelSubjectChooseSemester();
 
     cbbModelSubjectChooseSemester.addElement("--Choose semester-- ");
 
@@ -173,10 +170,7 @@ public class FormController {
   }
 
   public void updateCbbModelSubjectTeacher() {
-    try {
-      cbbModelSubjectTeacher.removeAllElements();
-    } catch (NullPointerException exc) {
-    }
+    initializeCbbModelSubjectTeacher();
 
     cbbModelSubjectTeacher.addElement("--Choose Teacher--");
 
@@ -187,11 +181,7 @@ public class FormController {
   }
 
   public void updateCbbModelSubjectSemester() {
-    try {
-      cbbModelSubjectSemester.removeAllElements();
-    } catch (NullPointerException exc) {
-
-    }
+    initializeCbbModelSubjectSemester();
 
     cbbModelSubjectSemester.addElement("--Choose Semester--");
 
@@ -202,11 +192,7 @@ public class FormController {
   }
 
   public void updateCbbModelExamChooseDate() {
-    try {
-      cbbModelExamChooseDate.removeAllElements();
-    } catch (NullPointerException exc) {
-
-    }
+    initializeCbbModelExamChooseDate();
 
     cbbModelExamChooseDate.addElement("--Choose Date--");
 
@@ -217,11 +203,7 @@ public class FormController {
   }
 
   public void updateCbbModelExamSubject() {
-    try {
-      cbbModelExamSubject.removeAllElements();
-    } catch (NullPointerException exc) {
-
-    }
+    initializeCbbModelExamSubject();
 
     cbbModelExamSubject.addElement("--Choose Subject");
 
@@ -232,11 +214,7 @@ public class FormController {
   }
 
   public void updateCbbModelTimetableChooseSemester() {
-    try {
-      cbbModelTimetableChooseSemester.removeAllElements();
-    } catch (NullPointerException exc) {
-
-    }
+    initializeCbbModelTimetableChooseSemester();
 
     cbbModelTimetableChooseSemester.addElement("--Choose Semester--");
 
@@ -247,11 +225,7 @@ public class FormController {
   }
 
   public void updateCbbModelTimetableChooseDay() {
-    try {
-      cbbModelTimetableChooseDay.removeAllElements();
-    } catch (NullPointerException exc) {
-
-    }
+    initializeCbbModelTimetableChooseDay();
 
     cbbModelTimetableChooseDay.addElement("--Choose Day--");
     for (int i = 0; i < dayOfWeek.length; i++) {
@@ -260,11 +234,7 @@ public class FormController {
   }
 
   public void updateCbbModelTimetableChooseSubject() {
-    try {
-      cbbModelTimetableChooseSubject.removeAllElements();
-    } catch (NullPointerException exc) {
-
-    }
+    initializeCbbModelTimetableChooseSubject();
 
     cbbModelTimetableChooseSubject.addElement("--Choose Subject--");
 
@@ -275,11 +245,7 @@ public class FormController {
   }
 
   public void updateCbbModelTimetableChooseSubjectAccordingToSemester(String semesterName) {
-    try {
-      cbbModelTimetableChooseSubject.removeAllElements();
-    } catch (NullPointerException exc) {
-
-    }
+    initializeCbbModelTimetableChooseSubject();
 
     cbbModelTimetableChooseSubject.addElement("--Choose Subject--");
 
@@ -290,11 +256,7 @@ public class FormController {
   }
 
   public void updateCbbModelTimetableChooseSubjectAccordingToSemesterAndDay(String semesterName, String dayName) {
-    try {
-      cbbModelTimetableChooseSubject.removeAllElements();
-    } catch (NullPointerException exc) {
-
-    }
+    initializeCbbModelTimetableChooseSubject();
 
     cbbModelTimetableChooseSubject.addElement("--Choose Subject--");
 
@@ -310,11 +272,7 @@ public class FormController {
   }
 
   public void updateCbbModelTimetableSubject() {
-    try {
-      cbbModelTimetableSubject.removeAllElements();
-    } catch (NullPointerException exc) {
-
-    }
+    initializeCbbModelTimetableSubject();
 
     cbbModelTimetableSubject.addElement("--Choose Subject--");
 
@@ -325,11 +283,7 @@ public class FormController {
   }
 
   public void updateCbbModelTimetableDay() {
-    try {
-      cbbModelTimetableDay.removeAllElements();
-    } catch (NullPointerException exc) {
-
-    }
+    initializeCbbModelTimetableDay();
 
     cbbModelTimetableDay.addElement("--Choose Day--");
     for (int i = 0; i < dayOfWeek.length; i++) {
@@ -338,11 +292,7 @@ public class FormController {
   }
 
   public void updateCbbModelTimetableTeacher() {
-    try {
-      cbbModelTimetableTeacher.removeAllElements();
-    } catch (NullPointerException exc) {
-
-    }
+    initializeCbbModelTimetableTeacher();
 
     cbbModelTimetableTeacher.addElement("--Choose Teacher--");
 
@@ -353,11 +303,7 @@ public class FormController {
   }
 
   public void updateCbbModelTimetableSemester() {
-    try {
-      cbbModelTimetableSemester.removeAllElements();
-    } catch (NullPointerException exc) {
-
-    }
+    initializeCbbModelTimetableSemester();
 
     cbbModelTimetableSemester.addElement("--Choose Semester--");
 

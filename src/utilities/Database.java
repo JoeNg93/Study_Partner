@@ -875,7 +875,8 @@ public class Database {
     return timeTables;
   }
 
-  public static TimeTable getTimeTableAccordingToSemesterDayStartTime(String semesterName, String dayName, String startTime) {
+  public static TimeTable getTimeTableAccordingToSubjectSemesterDayStartTime(String subjectName, String semesterName, String dayName, String startTime) {
+    Subject subject = Database.getSubjectAccordingToName(subjectName);
     int dayNumber = FormController.getDayNumber(dayName);
     Semester semester = Database.getSemesterAccordingToName(semesterName);
     Connection conn = connectStudyPartnerDB();
@@ -883,10 +884,11 @@ public class Database {
 
     try {
       PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM time_table WHERE " +
-          "semester_id = ? AND day = ? AND start_time = ?");
+          "semester_id = ? AND day = ? AND start_time = ? AND subject_id = ?");
       preparedStatement.setInt(1, semester.getId());
       preparedStatement.setInt(2, dayNumber);
       preparedStatement.setString(3, startTime);
+      preparedStatement.setInt(4, subject.getId());
       ResultSet result = preparedStatement.executeQuery();
       if (result.next()) {
         timeTable = getSingleTimeTableFromDB(result);
@@ -959,6 +961,7 @@ public class Database {
       preparedStatement.setString(5, timeTable.getEndTime().toString());
       preparedStatement.setInt(6, timeTable.getTeacher().getId());
       preparedStatement.setInt(7, timeTable.getSemester().getId());
+      preparedStatement.setInt(8, timeTable.getId());
       preparedStatement.executeUpdate();
     } catch (Exception exc) {
       exc.printStackTrace();
@@ -1201,7 +1204,7 @@ public class Database {
     int semesterId = result.getInt("semester_id");
     Semester semester = getSemesterAccordingToId(semesterId);
 
-    TimeTable timeTable = new TimeTable(subject, day, roomNumber, startTime, endTime, teacher, semester);
+    TimeTable timeTable = new TimeTable(id, subject, day, roomNumber, startTime, endTime, teacher, semester);
 
     return timeTable;
   }

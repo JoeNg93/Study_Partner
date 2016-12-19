@@ -16,7 +16,7 @@ public class FrmEditExam extends JFrame{
   public FrmEditExam() {
     setContentPane(pnEditExam);
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    pack();
+    setSize(500, 300);
     setVisible(false);
   }
 

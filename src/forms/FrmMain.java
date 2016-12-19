@@ -10,6 +10,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -84,8 +86,8 @@ public class FrmMain {
 
     /* -------------------- SUBJECT TAB -------------------- */
     /* cbbSubjectChooseSemester initialization */
-    cbbSubjectChooseSemester.setModel(formController.getCbbModelSubjectChooseSemester());
     formController.updateCbbModelSubjectChooseSemester();
+    cbbSubjectChooseSemester.setModel(formController.getCbbModelSubjectChooseSemester());
     handleClickOnCbbSubjectChooseSemester();
 
     /* tblSubjects initialization */
@@ -169,6 +171,7 @@ public class FrmMain {
     /* cbbExamChooseDate initialization */
     cbbExamChooseDate.setModel(formController.getCbbModelExamChooseDate());
     formController.updateCbbModelExamChooseDate();
+    cbbExamChooseDate.setModel(formController.getCbbModelExamChooseDate());
     handleClickOnCbbExamChooseDate();
 
     /* tblExams initialization */
@@ -198,18 +201,18 @@ public class FrmMain {
 
     /* -------------------- TIME TABLE TAB -------------------- */
     /* cbbTimetableChooseSemester initialization */
-    cbbTimetableChooseSemester.setModel(formController.getCbbModelTimetableChooseSemester());
     formController.updateCbbModelTimetableChooseSemester();
+    cbbTimetableChooseSemester.setModel(formController.getCbbModelTimetableChooseSemester());
     handleClickOnCbbTimetableChooseSemester();
 
     /* cbbTimetableChooseDay initialization */
-    cbbTimetableChooseDay.setModel(formController.getCbbModelTimetableChooseDay());
     formController.updateCbbModelTimetableChooseDay();
+    cbbTimetableChooseDay.setModel(formController.getCbbModelTimetableChooseDay());
     handleClickOnCbbTimetableChooseDay();
 
     /* cbbTimetableChooseSubject initialization */
-    cbbTimetableChooseSubject.setModel(formController.getCbbModelTimetableChooseSubject());
     formController.updateCbbModelTimetableChooseSubject();
+    cbbTimetableChooseSubject.setModel(formController.getCbbModelTimetableChooseSubject());
     handleClickCbbTimetableChooseSubject();
 
     /* tblTimetables initialization */
@@ -274,24 +277,23 @@ public class FrmMain {
   }
 
   public void handleClickOnCbbSubjectChooseSemester() {
-    cbbSubjectChooseSemester.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        if (cbbSubjectChooseSemester.getSelectedIndex() != 0) {
-//          fetchDataAccordingToCbbSemesterSelectedIndex();
-          subjects = Database.getSubjectsAccordingToSemesterName((String) cbbSubjectChooseSemester.getSelectedItem());
-          sendDataToTblSubjects();
-        } else {
-          updateTblSubjects();
-        }
+    cbbSubjectChooseSemester.addActionListener(e -> {
+      if (cbbSubjectChooseSemester.getSelectedIndex() != 0) {
+        subjects = Database.getSubjectsAccordingToSemesterName((String) cbbSubjectChooseSemester.getSelectedItem());
+        sendDataToTblSubjects();
+      } else {
+        updateTblSubjects();
       }
     });
   }
 
   public void handleClickOnBtnAddSubject() {
     btnAddSubject.addActionListener((ActionEvent e) -> {
+      clearForm(frmAddSubject);
       formController.updateCbbModelSubjectSemester();
+      frmAddSubject.getCbbSubjectSemester().setModel(formController.getCbbModelSubjectSemester());
       formController.updateCbbModelSubjectTeacher();
+      frmAddSubject.getCbbSubjectTeacher().setModel(formController.getCbbModelSubjectTeacher());
       frmAddSubject.getCbbSubjectSemester().setSelectedIndex(cbbSubjectChooseSemester.getSelectedIndex());
       frmAddSubject.setVisible(true);
     });
@@ -313,6 +315,8 @@ public class FrmMain {
       Database.addSubject(subject);
       cbbSubjectChooseSemester.setSelectedIndex(frmAddSubject.getCbbSubjectSemester().getSelectedIndex());
       updateTblSemesters();
+      formController.updateCbbModelTimetableChooseSubject();
+      cbbTimetableChooseSubject.setModel(formController.getCbbModelTimetableChooseSubject());
       frmAddSubject.dispose();
     });
   }
@@ -320,7 +324,9 @@ public class FrmMain {
   public void handleClickOnBtnEditSubject() {
     btnEditSubject.addActionListener(evt -> {
       formController.updateCbbModelSubjectTeacher();
+      frmEditSubject.getCbbSubjectTeacher().setModel(formController.getCbbModelSubjectTeacher());
       formController.updateCbbModelSubjectSemester();
+      frmEditSubject.getCbbSubjectSemester().setModel(formController.getCbbModelSubjectSemester());
       frmEditSubject.setVisible(true);
 
       int selectedRow = tblSubjects.getSelectedRow();
@@ -364,6 +370,7 @@ public class FrmMain {
       cbbExamChooseDate.setSelectedIndex(cbbExamChooseDate.getSelectedIndex());
       // Reset Timetable tab
       formController.updateCbbModelTimetableChooseSubject();
+      cbbTimetableChooseSubject.setModel(formController.getCbbModelTimetableChooseSubject());
       cbbTimetableChooseSemester.setSelectedIndex(0);
       cbbTimetableChooseDay.setSelectedIndex(0);
       updateTblTimetables();
@@ -384,6 +391,7 @@ public class FrmMain {
       cbbExamChooseDate.setSelectedIndex(cbbExamChooseDate.getSelectedIndex());
       // Reset Timetable tab
       formController.updateCbbModelTimetableChooseSubject();
+      cbbTimetableChooseSubject.setModel(formController.getCbbModelTimetableChooseSubject());
       cbbTimetableChooseSemester.setSelectedIndex(0);
       cbbTimetableChooseDay.setSelectedIndex(0);
       updateTblTimetables();
@@ -411,6 +419,7 @@ public class FrmMain {
 
   public void handleClickOnBtnAddSemester() {
     btnAddSemester.addActionListener((ActionEvent e) -> {
+      clearForm(frmAddSemester);
       frmAddSemester.setVisible(true);
     });
   }
@@ -438,9 +447,16 @@ public class FrmMain {
       updateTblSemesters();
       String currentSelectSemester = (String) cbbSubjectChooseSemester.getSelectedItem();
       formController.updateCbbModelSubjectChooseSemester();
+      cbbSubjectChooseSemester.setModel(formController.getCbbModelSubjectChooseSemester());
       cbbSubjectChooseSemester.setSelectedItem(currentSelectSemester);
       fetchSubjectsAccordingToCbbSubjectChooseSemesterSelectedIndex();
       sendDataToTblSubjects();
+      // Reset Timetable tab
+      formController.updateCbbModelTimetableChooseSemester();
+      cbbTimetableChooseSemester.setModel(formController.getCbbModelTimetableChooseSemester());
+      cbbTimetableChooseSubject.setSelectedIndex(0);
+      cbbTimetableChooseDay.setSelectedIndex(0);
+      updateTblTimetables();
       frmAddSemester.dispose();
     });
   }
@@ -472,11 +488,11 @@ public class FrmMain {
       Database.updateSemesterAccordingToId(semester);
       updateTblSemesters();
       formController.updateCbbModelSubjectChooseSemester();
+      cbbSubjectChooseSemester.setModel(formController.getCbbModelSubjectChooseSemester());
       updateTblSubjects();
-      // Reset Exam tab
-      cbbExamChooseDate.setSelectedIndex(cbbExamChooseDate.getSelectedIndex());
       // Reset Timetable tab
       formController.updateCbbModelTimetableChooseSemester();
+      cbbTimetableChooseSemester.setModel(formController.getCbbModelTimetableChooseSemester());
       cbbTimetableChooseSubject.setSelectedIndex(0);
       cbbTimetableChooseDay.setSelectedIndex(0);
       updateTblTimetables();
@@ -492,11 +508,11 @@ public class FrmMain {
       Database.deleteSemesterAccordingToName(semesterName);
       updateTblSemesters();
       formController.updateCbbModelSubjectChooseSemester();
+      cbbSubjectChooseSemester.setModel(formController.getCbbModelSubjectChooseSemester());
       updateTblSubjects();
-      // Reset Exam tab
-      cbbExamChooseDate.setSelectedIndex(cbbExamChooseDate.getSelectedIndex());
       // Reset Timetable tab
       formController.updateCbbModelTimetableChooseSemester();
+      cbbTimetableChooseSemester.setModel(formController.getCbbModelTimetableChooseSemester());
       cbbTimetableChooseSubject.setSelectedIndex(0);
       cbbTimetableChooseDay.setSelectedIndex(0);
       updateTblTimetables();
@@ -524,6 +540,7 @@ public class FrmMain {
 
   public void handleClickOnBtnAddTeacher() {
     btnAddTeacher.addActionListener(evt -> {
+      clearForm(frmAddTeacher);
       frmAddTeacher.setVisible(true);
     });
   }
@@ -630,7 +647,14 @@ public class FrmMain {
 
   public void handleClickOnBtnAddExam() {
     btnAddExam.addActionListener(e -> {
+      clearForm(frmAddExam);
       formController.updateCbbModelExamSubject();
+      frmAddExam.getCbbExamSubject().setModel(formController.getCbbModelExamSubject());
+      int currentSelectedIndex = cbbExamChooseDate.getSelectedIndex();
+      if (currentSelectedIndex != 0) {
+        String examDate = (String) cbbExamChooseDate.getSelectedItem();
+        frmAddExam.getTxtDate().setText(examDate);
+      }
       frmAddExam.setVisible(true);
     });
   }
@@ -645,6 +669,8 @@ public class FrmMain {
       Exam exam = new Exam(subject, startTime, examDate, description);
       Database.addExam(exam);
       updateTblExams();
+      formController.updateCbbModelExamChooseDate();
+      cbbExamChooseDate.setModel(formController.getCbbModelExamChooseDate());
       frmAddExam.dispose();
     });
   }
@@ -652,6 +678,7 @@ public class FrmMain {
   public void handleClickOnBtnEditExam() {
     btnEditExam.addActionListener(e -> {
       formController.updateCbbModelExamSubject();
+      frmEditExam.getCbbExamSubject().setModel(formController.getCbbModelExamSubject());
       frmEditExam.setVisible(true);
 
       int selectedRow = tblExams.getSelectedRow();
@@ -685,6 +712,7 @@ public class FrmMain {
       Database.updateExamAccordingToId(currentExam);
       updateTblExams();
       formController.updateCbbModelExamChooseDate();
+      cbbExamChooseDate.setModel(formController.getCbbModelExamChooseDate());
       frmEditExam.dispose();
     });
   }
@@ -696,6 +724,8 @@ public class FrmMain {
       Database.deleteExamAccordingToId(currentExam.getId());
       cbbExamChooseDate.setSelectedIndex(0);
       updateTblExams();
+      formController.updateCbbModelExamChooseDate();
+      cbbExamChooseDate.setModel(formController.getCbbModelExamChooseDate());
     });
   }
 
@@ -705,6 +735,7 @@ public class FrmMain {
       if (cbbTimetableChooseSemester.getSelectedIndex() != 0) {
         String semesterName = (String) cbbTimetableChooseSemester.getSelectedItem();
         formController.updateCbbModelTimetableChooseSubjectAccordingToSemester(semesterName);
+        cbbTimetableChooseSubject.setModel(formController.getCbbModelTimetableChooseSubject());
 
         if (cbbTimetableChooseDay.getSelectedIndex() == 0 && cbbTimetableChooseSubject.getSelectedIndex() == 0) {
           timetables = Database.getTimeTablesAccordingToSemesterName((String) cbbTimetableChooseSemester.getSelectedItem());
@@ -750,6 +781,7 @@ public class FrmMain {
           String semesterName = (String) cbbTimetableChooseSemester.getSelectedItem();
           String dayName = (String) cbbTimetableChooseDay.getSelectedItem();
           formController.updateCbbModelTimetableChooseSubjectAccordingToSemesterAndDay(semesterName, dayName);
+          cbbTimetableChooseSubject.setModel(formController.getCbbModelTimetableChooseSubject());
           timetables = Database.getTimeTablesAccordingToSemesterAndDay(semesterName, dayName);
           sendDataToTblTimetables();
         } else {
@@ -760,6 +792,7 @@ public class FrmMain {
       } else {
         String currentSubjectName = (String) cbbTimetableChooseSubject.getSelectedItem();
         formController.updateCbbModelTimetableChooseSubject();
+        cbbTimetableChooseSubject.setModel(formController.getCbbModelTimetableChooseSubject());
         cbbTimetableChooseSubject.setSelectedItem(currentSubjectName);
         if (cbbTimetableChooseSubject.getSelectedIndex() == 0 && cbbTimetableChooseSemester.getSelectedIndex() == 0) {
           updateTblTimetables();
@@ -783,7 +816,6 @@ public class FrmMain {
   public void handleClickCbbTimetableChooseSubject() {
     cbbTimetableChooseSubject.addActionListener(e -> {
       if (cbbTimetableChooseSubject.getSelectedIndex() != 0) {
-        System.out.println("Heree");
         // Get timetable according to subject
         timetables = Database.getTimeTablesAccordingToSubjectName((String) cbbTimetableChooseSubject.getSelectedItem());
         sendDataToTblTimetables();
@@ -797,10 +829,15 @@ public class FrmMain {
 
   public void handleClickOnBtnAddTimetable() {
     btnAddTimetable.addActionListener(e -> {
+      clearForm(frmAddTimetable);
       formController.updateCbbModelTimetableDay();
+      frmAddTimetable.getCbbTimetableDay().setModel(formController.getCbbModelTimetableDay());
       formController.updateCbbModelTimetableSemester();
+      frmAddTimetable.getCbbTimetableSemester().setModel(formController.getCbbModelTimetableSemester());
       formController.updateCbbModelTimetableSubject();
+      frmAddTimetable.getCbbTimetableSubject().setModel(formController.getCbbModelTimetableSubject());
       formController.updateCbbModelTimetableTeacher();
+      frmAddTimetable.getCbbTimetableTeacher().setModel(formController.getCbbModelTimetableTeacher());
       frmAddTimetable.getCbbTimetableSemester().setSelectedIndex(cbbTimetableChooseSemester.getSelectedIndex());
       frmAddTimetable.getCbbTimetableDay().setSelectedIndex(cbbTimetableChooseDay.getSelectedIndex());
       frmAddTimetable.getCbbTimetableSubject().setSelectedIndex(cbbTimetableChooseSubject.getSelectedIndex());
@@ -831,9 +868,13 @@ public class FrmMain {
   public void handleClickOnBtnEditTimetable() {
     btnEditTimetable.addActionListener(e -> {
       formController.updateCbbModelTimetableTeacher();
+      frmEditTimetable.getCbbTimetableTeacher().setModel(formController.getCbbModelTimetableTeacher());
       formController.updateCbbModelTimetableSubject();
+      frmEditTimetable.getCbbTimetableSubject().setModel(formController.getCbbModelTimetableSubject());
       formController.updateCbbModelTimetableSemester();
+      frmEditTimetable.getCbbTimetableSemester().setModel(formController.getCbbModelTimetableSemester());
       formController.updateCbbModelTimetableDay();
+      frmEditTimetable.getCbbTimetableDay().setModel(formController.getCbbModelTimetableDay());
 
       int selectedRow = tblTimetables.getSelectedRow();
       String subjectName = (String) tblTimetables.getValueAt(selectedRow, 0);
@@ -857,6 +898,15 @@ public class FrmMain {
 
   public void handleConfirmOnBtnEditTimetable() {
     frmEditTimetable.getBtnEditTimetable().addActionListener(e -> {
+      int selectedRow = tblTimetables.getSelectedRow();
+
+      String currentSubjectName = (String) tblTimetables.getValueAt(selectedRow, 0);
+      String currentDayName = (String) tblTimetables.getValueAt(selectedRow, 1);
+      String currentStartTime = (String) tblTimetables.getValueAt(selectedRow, 3);
+      String currentSemesterName = (String) tblTimetables.getValueAt(selectedRow, 6);
+      TimeTable timeTable = Database.getTimeTableAccordingToSubjectSemesterDayStartTime(currentSubjectName,
+          currentSemesterName, currentDayName, currentStartTime);
+
       String subjectName = (String) frmEditTimetable.getCbbTimetableSubject().getSelectedItem();
       Subject subject = Database.getSubjectAccordingToName(subjectName);
       String dayName = (String) frmEditTimetable.getCbbTimetableDay().getSelectedItem();
@@ -868,7 +918,14 @@ public class FrmMain {
       String roomNumber = frmEditTimetable.getTxtRoomNumber().getText();
       LocalTime startTime = LocalTime.parse(frmEditTimetable.getTxtStartTime().getText());
       LocalTime endTime = LocalTime.parse(frmEditTimetable.getTxtEndTime().getText());
-      TimeTable timeTable = new TimeTable(subject, dayNumber, roomNumber, startTime, endTime, teacher, semester);
+
+      timeTable.setSubject(subject);
+      timeTable.setDay(dayNumber);
+      timeTable.setRoomNumber(roomNumber);
+      timeTable.setTeacher(teacher);
+      timeTable.setSemester(semester);
+      timeTable.setStartTime(startTime);
+      timeTable.setEndTime(endTime);
 
       Database.updateTimeTableAccordingToId(timeTable);
       updateTblTimetables();
@@ -916,6 +973,14 @@ public class FrmMain {
     sendDataToTblSemesters();
     sendDataToTblSubjects();
     sendDataToTblTeachers();
+  }
+
+  private void clearForm(JFrame form) {
+    for (Component component : form.getContentPane().getComponents()) {
+      if (component instanceof JTextField) {
+        ((JTextField) component).setText("");
+      }
+    }
   }
 
   private void fetchSubjectsAccordingToCbbSubjectChooseSemesterSelectedIndex() {

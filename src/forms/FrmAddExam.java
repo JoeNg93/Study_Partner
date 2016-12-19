@@ -16,7 +16,7 @@ public class FrmAddExam extends JFrame {
   public FrmAddExam() {
     setContentPane(pnAddExam);
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    pack();
+    setSize(500 ,300);
     setVisible(false);
   }
 
