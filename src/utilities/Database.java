@@ -811,12 +811,154 @@ public class Database {
     return timeTables;
   }
 
+  public static ArrayList<TimeTable> getTimeTablesAccordingToSubjectName(String subjectName) {
+    Subject subject = Database.getSubjectAccordingToName(subjectName);
+    return getTimeTablesAccordingToSubjectId(subject.getId());
+  }
+
+  public static ArrayList<TimeTable> getTimeTablesAccordingToSemesterName(String semesterName) {
+    Semester semester = Database.getSemesterAccordingToName(semesterName);
+    return Database.getTimeTablesAccordingToSemesterId(semester.getId());
+  }
+
+  public static ArrayList<TimeTable> getTimeTablesAccordingToDay(String dayName) {
+    int dayNumber = FormController.getDayNumber(dayName);
+    Connection conn = connectStudyPartnerDB();
+    ArrayList<TimeTable> timeTables = new ArrayList<>();
+    try {
+      PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM time_table WHERE day = ?");
+      preparedStatement.setInt(1, dayNumber);
+      ResultSet result = preparedStatement.executeQuery();
+      while (result.next()) {
+        TimeTable timeTable = getSingleTimeTableFromDB(result);
+        timeTables.add(timeTable);
+      }
+    } catch (Exception exc) {
+      exc.printStackTrace();
+    } finally {
+      try {
+        conn.close();
+      } catch (SQLException exc) {
+        exc.printStackTrace();
+      }
+    }
+
+    return timeTables;
+  }
+
+  public static ArrayList<TimeTable> getTimeTablesAccordingToSemesterAndDay(String semesterName, String dayName) {
+    int dayNumber = FormController.getDayNumber(dayName);
+    Semester semester = Database.getSemesterAccordingToName(semesterName);
+    Connection conn = connectStudyPartnerDB();
+    ArrayList<TimeTable> timeTables = new ArrayList<>();
+
+    try {
+      PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM time_table WHERE day = ? " +
+          "AND semester_id = ?");
+      preparedStatement.setInt(1, dayNumber);
+      preparedStatement.setInt(2, semester.getId());
+      ResultSet result = preparedStatement.executeQuery();
+      while (result.next()) {
+        TimeTable timeTable = getSingleTimeTableFromDB(result);
+        timeTables.add(timeTable);
+      }
+    } catch (Exception exc) {
+      exc.printStackTrace();
+    } finally {
+      try {
+        conn.close();
+      } catch (SQLException exc) {
+        exc.printStackTrace();
+      }
+    }
+
+    return timeTables;
+  }
+
+  public static TimeTable getTimeTableAccordingToSemesterDayStartTime(String semesterName, String dayName, String startTime) {
+    int dayNumber = FormController.getDayNumber(dayName);
+    Semester semester = Database.getSemesterAccordingToName(semesterName);
+    Connection conn = connectStudyPartnerDB();
+    TimeTable timeTable = null;
+
+    try {
+      PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM time_table WHERE " +
+          "semester_id = ? AND day = ? AND start_time = ?");
+      preparedStatement.setInt(1, semester.getId());
+      preparedStatement.setInt(2, dayNumber);
+      preparedStatement.setString(3, startTime);
+      ResultSet result = preparedStatement.executeQuery();
+      if (result.next()) {
+        timeTable = getSingleTimeTableFromDB(result);
+      }
+    } catch (Exception exc) {
+      exc.printStackTrace();
+    } finally {
+      try {
+        conn.close();
+      } catch (SQLException exc) {
+        exc.printStackTrace();
+      }
+    }
+
+    return timeTable;
+  }
+
   public static void deleteTimeTableAccordingToId(int timeTableId) {
     Connection conn = connectStudyPartnerDB();
 
     try {
       PreparedStatement preparedStatement = conn.prepareStatement("DELETE FROM time_table WHERE id = ?");
       preparedStatement.setInt(1, timeTableId);
+      preparedStatement.executeUpdate();
+    } catch (Exception exc) {
+      exc.printStackTrace();
+    } finally {
+      try {
+        conn.close();
+      } catch (SQLException exc) {
+        exc.printStackTrace();
+      }
+    }
+  }
+
+  public static void deleteTimetableAccordingToSubjectDayStartTime(String subjectName, String dayName, String startTime) {
+    Subject subject = Database.getSubjectAccordingToName(subjectName);
+    int dayNumber = FormController.getDayNumber(dayName);
+    Connection conn = connectStudyPartnerDB();
+
+    try {
+      PreparedStatement preparedStatement = conn.prepareStatement("DELETE FROM time_table WHERE " +
+          "subject_id = ? AND day = ? AND start_time = ?");
+      preparedStatement.setInt(1, subject.getId());
+      preparedStatement.setInt(2, dayNumber);
+      preparedStatement.setString(3, startTime);
+      preparedStatement.executeUpdate();
+    } catch (Exception exc) {
+      exc.printStackTrace();
+    } finally {
+      try {
+        conn.close();
+      } catch (SQLException exc) {
+        exc.printStackTrace();
+      }
+    }
+  }
+
+  public static void updateTimeTableAccordingToId(TimeTable timeTable) {
+    Connection conn = connectStudyPartnerDB();
+
+    try {
+      PreparedStatement preparedStatement = conn.prepareStatement("UPDATE time_table SET " +
+          "subject_id = ?, day = ?, room_number = ?, start_time = ?, end_time = ?, teacher_id = ?, semester_id = ? " +
+          "WHERE id = ?");
+      preparedStatement.setInt(1, timeTable.getSubject().getId());
+      preparedStatement.setInt(2, timeTable.getDay());
+      preparedStatement.setString(3, timeTable.getRoomNumber());
+      preparedStatement.setString(4, timeTable.getStartTime().toString());
+      preparedStatement.setString(5, timeTable.getEndTime().toString());
+      preparedStatement.setInt(6, timeTable.getTeacher().getId());
+      preparedStatement.setInt(7, timeTable.getSemester().getId());
       preparedStatement.executeUpdate();
     } catch (Exception exc) {
       exc.printStackTrace();

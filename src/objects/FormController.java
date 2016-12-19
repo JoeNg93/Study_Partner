@@ -5,6 +5,8 @@ import utilities.Database;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * Created by joenguyen on 9/18/16.
@@ -15,6 +17,7 @@ public class FormController {
   private DefaultTableModel tblModelSemester;
   private DefaultTableModel tblModelTeacher;
   private DefaultTableModel tblModelExam;
+  private DefaultTableModel tblModelTimetable;
 
   // Name note: cbbModel[tabName][nameOfCombobox]
   private DefaultComboBoxModel cbbModelSubjectChooseSemester; // Choose semester of Subject tab
@@ -23,12 +26,22 @@ public class FormController {
   private DefaultComboBoxModel cbbModelSubjectTeacher; // Choose teacher of Subject tab, Add Subject
   private DefaultComboBoxModel cbbModelExamChooseDate; // Choose date of Exam tab
   private DefaultComboBoxModel cbbModelExamSubject;
+  private DefaultComboBoxModel cbbModelTimetableChooseSemester;
+  private DefaultComboBoxModel cbbModelTimetableChooseDay;
+  private DefaultComboBoxModel cbbModelTimetableChooseSubject;
+  private DefaultComboBoxModel cbbModelTimetableSubject;
+  private DefaultComboBoxModel cbbModelTimetableDay;
+  private DefaultComboBoxModel cbbModelTimetableTeacher;
+  private DefaultComboBoxModel cbbModelTimetableSemester;
+
+  private static final String[] dayOfWeek = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
   public FormController() {
     initializeTblModelSubject();
     initializeTblModelSemester();
     initializeTblModelTeacher();
     initializeTblModelExam();
+    initializeTblModelTimetable();
 
     initializeCbbModelSubjectChooseSemester();
     initializeCbbModelSemesterTerm();
@@ -36,6 +49,14 @@ public class FormController {
     initializeCbbModelSubjectTeacher();
     initializeCbbModelExamChooseDate();
     initializeCbbModelExamSubject();
+    initializeCbbModelTimetableChooseSemester();
+    initializeCbbModelTimetableChooseDay();
+    initializeCbbModelTimetableChooseSubject();
+    initializeCbbModelTimetableSubject();
+    initializeCbbModelTimetableDay();
+    initializeCbbModelTimetableTeacher();
+    initializeCbbModelTimetableSemester();
+
   }
 
   private void initializeTblModelSubject() {
@@ -60,6 +81,18 @@ public class FormController {
     tblModelExam.addColumn("Date");
     tblModelExam.addColumn("Start Time");
     tblModelExam.addColumn("Description");
+  }
+
+  private void initializeTblModelTimetable() {
+    tblModelTimetable = new DefaultTableModel();
+
+    tblModelTimetable.addColumn("Subject");
+    tblModelTimetable.addColumn("Day");
+    tblModelTimetable.addColumn("Room Number");
+    tblModelTimetable.addColumn("Start Time");
+    tblModelTimetable.addColumn("End Time");
+    tblModelTimetable.addColumn("Teacher");
+    tblModelTimetable.addColumn("Semester");
   }
 
   private void initializeCbbModelSubjectChooseSemester() {
@@ -97,10 +130,39 @@ public class FormController {
     cbbModelExamSubject = new DefaultComboBoxModel();
   }
 
+  public void initializeCbbModelTimetableChooseSemester() {
+    cbbModelTimetableChooseSemester = new DefaultComboBoxModel();
+  }
+
+  public void initializeCbbModelTimetableChooseDay() {
+    cbbModelTimetableChooseDay = new DefaultComboBoxModel();
+  }
+
+  public void initializeCbbModelTimetableChooseSubject() {
+    cbbModelTimetableChooseSubject = new DefaultComboBoxModel();
+  }
+
+  public void initializeCbbModelTimetableSubject() {
+    cbbModelTimetableSubject = new DefaultComboBoxModel();
+  }
+
+  public void initializeCbbModelTimetableDay() {
+    cbbModelTimetableDay = new DefaultComboBoxModel();
+  }
+
+  public void initializeCbbModelTimetableTeacher() {
+    cbbModelTimetableTeacher = new DefaultComboBoxModel();
+  }
+
+  public void initializeCbbModelTimetableSemester() {
+    cbbModelTimetableSemester = new DefaultComboBoxModel();
+  }
+
   public void updateCbbModelSubjectChooseSemester() {
     try {
       cbbModelSubjectChooseSemester.removeAllElements();
-    } catch (NullPointerException exc) { }
+    } catch (NullPointerException exc) {
+    }
 
     cbbModelSubjectChooseSemester.addElement("--Choose semester-- ");
 
@@ -113,7 +175,8 @@ public class FormController {
   public void updateCbbModelSubjectTeacher() {
     try {
       cbbModelSubjectTeacher.removeAllElements();
-    } catch (NullPointerException exc) { }
+    } catch (NullPointerException exc) {
+    }
 
     cbbModelSubjectTeacher.addElement("--Choose Teacher--");
 
@@ -147,9 +210,9 @@ public class FormController {
 
     cbbModelExamChooseDate.addElement("--Choose Date--");
 
-    ArrayList<Exam> exams = Database.getExams();
-    for (Exam exam : exams) {
-      cbbModelExamChooseDate.addElement(exam.getDate().toString());
+    ArrayList<String> examDates = Database.getAllExamDates();
+    for (String examDate : examDates) {
+      cbbModelExamChooseDate.addElement(examDate);
     }
   }
 
@@ -163,8 +226,144 @@ public class FormController {
     cbbModelExamSubject.addElement("--Choose Subject");
 
     ArrayList<Subject> subjects = Database.getSubjects();
-    for (Subject subject: subjects) {
+    for (Subject subject : subjects) {
       cbbModelExamSubject.addElement(subject.getName());
+    }
+  }
+
+  public void updateCbbModelTimetableChooseSemester() {
+    try {
+      cbbModelTimetableChooseSemester.removeAllElements();
+    } catch (NullPointerException exc) {
+
+    }
+
+    cbbModelTimetableChooseSemester.addElement("--Choose Semester--");
+
+    ArrayList<Semester> semesters = Database.getSemesters();
+    for (Semester semester : semesters) {
+      cbbModelTimetableChooseSemester.addElement(semester.getName());
+    }
+  }
+
+  public void updateCbbModelTimetableChooseDay() {
+    try {
+      cbbModelTimetableChooseDay.removeAllElements();
+    } catch (NullPointerException exc) {
+
+    }
+
+    cbbModelTimetableChooseDay.addElement("--Choose Day--");
+    for (int i = 0; i < dayOfWeek.length; i++) {
+      cbbModelTimetableChooseDay.addElement(getDayName(i));
+    }
+  }
+
+  public void updateCbbModelTimetableChooseSubject() {
+    try {
+      cbbModelTimetableChooseSubject.removeAllElements();
+    } catch (NullPointerException exc) {
+
+    }
+
+    cbbModelTimetableChooseSubject.addElement("--Choose Subject--");
+
+    ArrayList<Subject> subjects = Database.getSubjects();
+    for (Subject subject : subjects) {
+      cbbModelTimetableChooseSubject.addElement(subject.getName());
+    }
+  }
+
+  public void updateCbbModelTimetableChooseSubjectAccordingToSemester(String semesterName) {
+    try {
+      cbbModelTimetableChooseSubject.removeAllElements();
+    } catch (NullPointerException exc) {
+
+    }
+
+    cbbModelTimetableChooseSubject.addElement("--Choose Subject--");
+
+    ArrayList<Subject> subjects = Database.getSubjectsAccordingToSemesterName(semesterName);
+    for (Subject subject : subjects) {
+      cbbModelTimetableChooseSubject.addElement(subject.getName());
+    }
+  }
+
+  public void updateCbbModelTimetableChooseSubjectAccordingToSemesterAndDay(String semesterName, String dayName) {
+    try {
+      cbbModelTimetableChooseSubject.removeAllElements();
+    } catch (NullPointerException exc) {
+
+    }
+
+    cbbModelTimetableChooseSubject.addElement("--Choose Subject--");
+
+    ArrayList<TimeTable> timeTables = Database.getTimeTablesAccordingToSemesterAndDay(semesterName, dayName);
+    ArrayList<String> subjectNames = new ArrayList<>();
+    for (TimeTable timeTable : timeTables) {
+      subjectNames.add(timeTable.getSubject().getName());
+    }
+    HashSet<String> uniqueSubjectNames = new HashSet<>(subjectNames);
+    for (String subjectName : uniqueSubjectNames) {
+      cbbModelTimetableChooseSubject.addElement(subjectName);
+    }
+  }
+
+  public void updateCbbModelTimetableSubject() {
+    try {
+      cbbModelTimetableSubject.removeAllElements();
+    } catch (NullPointerException exc) {
+
+    }
+
+    cbbModelTimetableSubject.addElement("--Choose Subject--");
+
+    ArrayList<Subject> subjects = Database.getSubjects();
+    for (Subject subject : subjects) {
+      cbbModelTimetableSubject.addElement(subject.getName());
+    }
+  }
+
+  public void updateCbbModelTimetableDay() {
+    try {
+      cbbModelTimetableDay.removeAllElements();
+    } catch (NullPointerException exc) {
+
+    }
+
+    cbbModelTimetableDay.addElement("--Choose Day--");
+    for (int i = 0; i < dayOfWeek.length; i++) {
+      cbbModelTimetableDay.addElement(getDayName(i));
+    }
+  }
+
+  public void updateCbbModelTimetableTeacher() {
+    try {
+      cbbModelTimetableTeacher.removeAllElements();
+    } catch (NullPointerException exc) {
+
+    }
+
+    cbbModelTimetableTeacher.addElement("--Choose Teacher--");
+
+    ArrayList<Teacher> teachers = Database.getTeachers();
+    for (Teacher teacher : teachers) {
+      cbbModelTimetableTeacher.addElement(teacher.getName());
+    }
+  }
+
+  public void updateCbbModelTimetableSemester() {
+    try {
+      cbbModelTimetableSemester.removeAllElements();
+    } catch (NullPointerException exc) {
+
+    }
+
+    cbbModelTimetableSemester.addElement("--Choose Semester--");
+
+    ArrayList<Semester> semesters = Database.getSemesters();
+    for (Semester semester : semesters) {
+      cbbModelTimetableSemester.addElement(semester.getName());
     }
   }
 
@@ -192,6 +391,10 @@ public class FormController {
     return tblModelTeacher;
   }
 
+  public DefaultTableModel getTblModelTimetable() {
+    return tblModelTimetable;
+  }
+
   public DefaultComboBoxModel getCbbModelSubjectSemester() {
     return cbbModelSubjectSemester;
   }
@@ -206,5 +409,41 @@ public class FormController {
 
   public DefaultComboBoxModel getCbbModelExamSubject() {
     return cbbModelExamSubject;
+  }
+
+  public DefaultComboBoxModel getCbbModelTimetableChooseDay() {
+    return cbbModelTimetableChooseDay;
+  }
+
+  public DefaultComboBoxModel getCbbModelTimetableChooseSemester() {
+    return cbbModelTimetableChooseSemester;
+  }
+
+  public DefaultComboBoxModel getCbbModelTimetableChooseSubject() {
+    return cbbModelTimetableChooseSubject;
+  }
+
+  public DefaultComboBoxModel getCbbModelTimetableDay() {
+    return cbbModelTimetableDay;
+  }
+
+  public DefaultComboBoxModel getCbbModelTimetableSemester() {
+    return cbbModelTimetableSemester;
+  }
+
+  public DefaultComboBoxModel getCbbModelTimetableSubject() {
+    return cbbModelTimetableSubject;
+  }
+
+  public DefaultComboBoxModel getCbbModelTimetableTeacher() {
+    return cbbModelTimetableTeacher;
+  }
+
+  public static String getDayName(int dayNumber) {
+    return dayOfWeek[dayNumber];
+  }
+
+  public static int getDayNumber(String dayName) {
+    return Arrays.asList(dayOfWeek).indexOf(dayName);
   }
 }
