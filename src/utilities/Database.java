@@ -1046,6 +1046,31 @@ public class Database {
     return exam;
   }
 
+  public static ArrayList<Exam> getExamsAccordingToSemesterName(String semesterName) {
+    String term = semesterName.split(" ")[0];
+    int year  = Integer.parseInt(semesterName.split(" ")[1]);
+    ArrayList<Exam> allExams = getExams();
+    ArrayList<Exam> currentExams = new ArrayList<>();
+
+    for (Exam exam : allExams) {
+      int examMonth = exam.getDate().getMonthValue();
+      int examYear = exam.getDate().getYear();
+      if (examYear == year) {
+        if (term.equals("Autumn")) {
+          if (examMonth >= 8 && examMonth <= 12) {
+            currentExams.add(exam);
+          }
+        } else {
+          if (examMonth >= 1 && examMonth <= 5) {
+            currentExams.add(exam);
+          }
+        }
+      }
+    }
+
+    return currentExams;
+  }
+
   public static ArrayList<Exam> getExamsAccordingToDate(LocalDate date) {
     Connection conn = connectStudyPartnerDB();
     ArrayList<Exam> exams = new ArrayList<>();

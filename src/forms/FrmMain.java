@@ -14,6 +14,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FrmMain {
@@ -21,7 +22,7 @@ public class FrmMain {
   private JPanel pnMain;
   private JTabbedPane tabbedPane1;
 
-  private JPanel pnNotifications;
+  private JPanel pnDashboard;
 
   // SUBJECT TAB
   private JPanel pnSubjects;
@@ -70,6 +71,11 @@ public class FrmMain {
   private JButton btnEditTimetable;
   private JButton btnDeleteTimetable;
   private JTable tblTimetables;
+  private JLabel lblToday;
+  private JLabel lblTimetable;
+  private JLabel lblExam;
+  private JTextArea txtaTimetable;
+  private JTextArea txtaExam;
   private FrmAddTimetable frmAddTimetable;
   private FrmEditTimetable frmEditTimetable;
 
@@ -245,6 +251,10 @@ public class FrmMain {
 
     /* btnDeleteTimetable initialization */
     handleClickOnBtnDeleteTimetable();
+
+    /* -------------------- DASHBOARD TAB -------------------- */
+    initializeDashboard();
+    fetchInfoToDashboard();
   }
 
   public static void main(String[] args) {
@@ -671,6 +681,7 @@ public class FrmMain {
       updateTblExams();
       formController.updateCbbModelExamChooseDate();
       cbbExamChooseDate.setModel(formController.getCbbModelExamChooseDate());
+      fetchInfoToDashboard();
       frmAddExam.dispose();
     });
   }
@@ -713,6 +724,7 @@ public class FrmMain {
       updateTblExams();
       formController.updateCbbModelExamChooseDate();
       cbbExamChooseDate.setModel(formController.getCbbModelExamChooseDate());
+      fetchInfoToDashboard();
       frmEditExam.dispose();
     });
   }
@@ -726,6 +738,7 @@ public class FrmMain {
       updateTblExams();
       formController.updateCbbModelExamChooseDate();
       cbbExamChooseDate.setModel(formController.getCbbModelExamChooseDate());
+      fetchInfoToDashboard();
     });
   }
 
@@ -861,6 +874,7 @@ public class FrmMain {
       TimeTable timeTable = new TimeTable(subject, dayNumber, roomNumber, startTime, endTime, teacher, semester);
       Database.addTimeTable(timeTable);
       updateTblTimetables();
+      fetchInfoToDashboard();
       frmAddTimetable.dispose();
     });
   }
@@ -929,6 +943,7 @@ public class FrmMain {
 
       Database.updateTimeTableAccordingToId(timeTable);
       updateTblTimetables();
+      fetchInfoToDashboard();
       frmEditTimetable.dispose();
     });
   }
@@ -944,6 +959,7 @@ public class FrmMain {
       cbbTimetableChooseSemester.setSelectedIndex(0);
       cbbTimetableChooseSubject.setSelectedIndex(0);
       updateTblTimetables();
+      fetchInfoToDashboard();
     });
   }
 
@@ -968,6 +984,70 @@ public class FrmMain {
     sendDataToTblTimetables();
   }
 
+  /* -------------------- NOTIFICATION TAB -------------------- */
+  public void initializeDashboard() {
+    txtaTimetable.setEditable(false);
+    txtaTimetable.setFont(new Font("Serif", Font.PLAIN, 16));
+    txtaExam.setEditable(false);
+    txtaExam.setFont(new Font("Serif", Font.PLAIN, 16));
+  }
+
+  public void fetchInfoToDashboard() {
+    LocalDate today = LocalDate.now();
+    String todayName = FormController.getDayName(today.getDayOfWeek().getValue());
+    txtaTimetable.append("Today is " + todayName + ", " + today.toString() + "\n\n");
+
+    int year = today.getYear();
+    int month = today.getMonthValue();
+    String term = "";
+    if (month >= 8 && month <= 12) {
+      term = "Autumn";
+    } else {
+      term = "Spring";
+    }
+
+    String semesterName = term + " " + year;
+    System.out.println(semesterName);
+    int tomorrow = today.getDayOfWeek().getValue() + 1;
+    String tomorrowName = FormController.getDayName(tomorrow);
+    System.out.println(tomorrowName);
+    ArrayList<TimeTable> timeTables = Database.getTimeTablesAccordingToSemesterAndDay(semesterName, tomorrowName);
+    StringBuilder strBuilder = new StringBuilder();
+    if (timeTables.size() == 0) {
+      txtaTimetable.append("You have no class tomorrow! Let's celebrate");
+    } else if (timeTables.size() == 1) {
+      txtaTimetable.append("You have 1 class tomorrow:\n\n");
+      TimeTable timeTable = timeTables.get(0);
+      txtaTimetable.append(timeTable.getSubject().getName() + " from " + timeTable.getStartTime().toString() + " to " +
+          timeTable.getEndTime().toString() + " at room " + timeTable.getRoomNumber());
+    } else {
+      txtaTimetable.append("You have " + timeTables.size() + " classes tomorrow: \n\n");
+      for (TimeTable timeTable : timeTables) {
+        txtaTimetable.append(timeTable.getSubject().getName() + " from " + timeTable.getStartTime().toString() + " to " +
+            timeTable.getEndTime().toString() + " at room " + timeTable.getRoomNumber() + "\n\n");
+      }
+    }
+
+    ArrayList<Exam> currentExams = Database.getExamsAccordingToSemesterName(semesterName);
+    if (currentExams.size() == 0) {
+      txtaExam.append("You have no exam in this term");
+    } else if (currentExams.size() == 1) {
+      txtaExam.append("You have 1 exam in this term:\n\n");
+      Exam exam = currentExams.get(0);
+      txtaExam.append(exam.getSubject().getName() + " on " + exam.getDate().toString() + ", starting at " +
+      exam.getStartTime().toString() + "\n");
+      txtaExam.append("Info about this exam: " + exam.getDescription() + "\n");
+    } else {
+      txtaExam.append("You have " + currentExams.size() + " exams in this term:\n\n");
+      for (Exam exam : currentExams) {
+        txtaExam.append(exam.getSubject().getName() + " on " + exam.getDate().toString() + ", starting at " +
+            exam.getStartTime().toString() + "\n");
+        txtaExam.append("Info about this exam: " + exam.getDescription() + "\n\n");
+      }
+    }
+
+  }
+
   /* -------------------- OTHER STUFF -------------------- */
   private void updateAllTable() {
     sendDataToTblSemesters();
@@ -990,4 +1070,5 @@ public class FrmMain {
       subjects = Database.getSubjects();
     }
   }
+
 }

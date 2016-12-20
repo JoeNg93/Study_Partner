@@ -16,7 +16,7 @@ public class FrmEditSubject extends JFrame{
   public FrmEditSubject() {
     setContentPane(pnEditSubject);
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    pack();
+    setSize(400, 300);
     setVisible(false);
   }
 
