@@ -874,6 +874,9 @@ public class FrmMain {
       TimeTable timeTable = new TimeTable(subject, dayNumber, roomNumber, startTime, endTime, teacher, semester);
       Database.addTimeTable(timeTable);
       updateTblTimetables();
+      cbbTimetableChooseSubject.setSelectedIndex(0);
+      cbbTimetableChooseDay.setSelectedIndex(0);
+      cbbTimetableChooseSemester.setSelectedIndex(cbbTimetableChooseSemester.getSelectedIndex());
       fetchInfoToDashboard();
       frmAddTimetable.dispose();
     });
@@ -993,6 +996,9 @@ public class FrmMain {
   }
 
   public void fetchInfoToDashboard() {
+    txtaExam.setText("");
+    txtaTimetable.setText("");
+
     LocalDate today = LocalDate.now();
     String todayName = FormController.getDayName(today.getDayOfWeek().getValue());
     txtaTimetable.append("Today is " + todayName + ", " + today.toString() + "\n\n");
@@ -1008,7 +1014,7 @@ public class FrmMain {
 
     String semesterName = term + " " + year;
     System.out.println(semesterName);
-    int tomorrow = today.getDayOfWeek().getValue() + 1;
+    int tomorrow = today.getDayOfWeek().getValue();
     String tomorrowName = FormController.getDayName(tomorrow);
     System.out.println(tomorrowName);
     ArrayList<TimeTable> timeTables = Database.getTimeTablesAccordingToSemesterAndDay(semesterName, tomorrowName);
